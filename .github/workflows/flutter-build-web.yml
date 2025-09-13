@@ -8,7 +8,7 @@ on:
         required: true
         type: string
     secrets:
-      github_token:
+      github_x_token:
         required: true
 
 jobs:
