@@ -1,0 +1,52 @@
+name: Flutter Build (Android)
+
+on:
+  workflow_call:
+    inputs:
+      flutter_version:
+        description: "Flutter version to use"
+        required: false
+        default: "stable"
+        type: string
+      apk_name:
+        description: "Name of the output APK file"
+        required: false
+        default: "app-release.apk"
+        type: string
+    secrets:
+      github_x_token:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ inputs.flutter_version }}
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🧪 Run analyzer
+        run: flutter analyze
+
+      - name: 🛠️ Build APK
+        run: flutter build apk --release
+
+      - name: 📝 Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/${{ inputs.apk_name }}
+
+      - name: 📢 Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/${{ inputs.apk_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_x_token }}
