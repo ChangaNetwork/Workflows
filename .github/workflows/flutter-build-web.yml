@@ -33,7 +33,7 @@ jobs:
       - name: Deploy to target branch
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.github_x_token }}
           publish_branch: ${{ inputs.publish_branch }}
           publish_dir: ./build/web
           force_orphan: true
