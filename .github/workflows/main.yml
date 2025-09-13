@@ -1,0 +1,39 @@
+name: Flutter Build & Deploy
+
+on:
+  workflow_call:
+    inputs:
+      publish_branch:
+        description: "Target branch to deploy web build artifacts"
+        required: true
+        type: string
+    secrets:
+      github_token:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web
+        run: flutter build web --release
+
+      - name: Deploy to target branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.github_token }}
+          publish_branch: ${{ inputs.publish_branch }}
+          publish_dir: ./build/web
+          force_orphan: true
