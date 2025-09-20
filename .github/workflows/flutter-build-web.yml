@@ -1,4 +1,4 @@
-name: Flutter Build & Deploy
+name: Flutter Build (Web)
 
 on:
   workflow_call:
@@ -7,6 +7,10 @@ on:
         description: "Target branch to deploy web build artifacts"
         required: true
         type: string
+      wasm:
+        description: "If passed it will compile for WebAssembly"
+        required: false
+        type: boolean
     secrets:
       github_x_token:
         required: true
@@ -27,8 +31,13 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build web
+      - name: Build web (default)
+        if: ${{ !inputs.wasm }}
         run: flutter build web --release
+      
+      - name: Build web (wasm)
+        if: ${{ inputs.wasm }}
+        run: flutter build web --release --wasm
 
       - name: Deploy to target branch
         uses: peaceiris/actions-gh-pages@v4
